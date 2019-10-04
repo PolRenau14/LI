@@ -12,7 +12,7 @@ prod([X|L],P):-prod(L,P2),P is P2*X.
 
 
 pescalar([L1],[L2],L1*L2).
-pescalar([X1|L1],[X2|L2],P):- pescalar(L1,L2,P2), Aux is X1 * X2, P is P2 + Aux. 
+pescalar([X1|L1],[X2|L2],P):- pescalar(L1,L2,P2), Aux is X1 * X2, P is P2 + Aux.
 
 % (dificultad 2) Representando conjuntos con listas sin repeticiones, escribe predi-
 % cados para las operaciones de intersección y unión de conjuntos dados.
@@ -25,7 +25,7 @@ pert(X,[_|L]):- pert(X,L).
 my_interseccion([],_,[]).
 my_interseccion([X|L1],L2,[X|R]):-
     pert(X,L2),!, my_interseccion(L1,L2,R).
-    
+
 % X no pertany a L2, per tant la saltem, no ens importa el seu valor.
 my_interseccion([_|L1],L2,R):- my_interseccion(L1,L2,R).
 
@@ -63,3 +63,61 @@ dados(P,N,[X|LR]):-
     Px is P-X, Nx is N-1,
     dados(Px,Nx,LR).
 
+%(dificultad 2) Escribe un predicado suma demas(L) que, dada una lista de enteros L, se satisface si existe algun elemento en ´ L que es igual a la suma de los
+% demas elementos de ´ L, y falla en caso contrario.
+
+suma_lista([],0).
+suma_lista([X|L],R):- suma_lista(L,RX), R is RX + X.
+
+suma_demas([]).
+suma_demas(L):- append(L1,[X|L2],L),append(L1,L2,LS), suma_lista(LS,SX),X == SX.
+
+% (dificultad 2) Escribe un predicado suma ants(L) que, dada una lista de enteros L, se satisface si existe algun elemento en ´ L que es igual a la suma de los
+% elementos anteriores a el en ´ L, y falla en caso contrario.
+
+suma_ants([]).
+suma_ants([X,Y|_]):- X==Y.
+suma_ants([X,Y|L]):- X1 is X+Y, suma_ants([X1|L]).
+
+
+% (dificultad 2) Escribe un predicado card(L) que, dada una lista de enteros L,
+% escriba la lista que, para cada elemento de L, dice cuantas veces aparece este ´
+% elemento en L. Por ejemplo, card( [1,2,1,5,1,3,3,7] ) escribira´
+% [[1,3],[2,1],[5,1],[3,2],[7,1]].
+
+
+count_elem_remove(_,[],0,[]).
+count_elem_remove(X,[X|L],C,LR):- count_elem_remove(X,L,C1,LR), C is C1 + 1 .
+count_elem_remove(X,[Y|L],C,[Y|LR]):- count_elem_remove(X,L,C,LR).
+
+card([],[]).
+card([X|L],LR):-count_elem_remove(X,[X|L],C,L1), card(L1,LR2), append([[X,C]],LR2,LR).
+
+card(L):- card(L,LR),write(LR).
+
+% (dificultad 2) Escribe un predicado Prolog est´a ordenada(L) que signifique
+% “la lista L de numeros enteros est ´ a ordenada de menor a mayor”. Por ejemplo, ´
+% con ?-est´a ordenada([3,45,67,83]). dice yes
+% Con ?-est´a ordenada([3,67,45]). dice no
+
+ordenada([]).
+ordenada([_]).
+ordenada([X,Y|L]):- X =< Y, ordenada([Y|L]).
+
+% (dificultad 2) Escribe un predicado Prolog ordenaci´on(L1,L2) que signifique
+% “L2 es la lista de enteros L1 ordenada de menor a mayor”. Por ejemplo: si L1 es
+% [8,4,5,3,3,2], L2 sera´ [2,3,3,4,5,8]. Hazlo en una l´ınea, utilizando solo ´
+% los predicados permutaci´on y est´a ordenada.
+
+pert_con_resto(X,L,R):- append(L1,[X|L2],L), append(L1,L2,R).
+
+permutacion([],[]).
+permutacion(L,[X|P]) :- pert_con_resto(X,L,R), permutacion(R,P).
+
+ordenacion(L1,L2):- permutacion(L1,L2),ordenada(L2).
+
+% (dificultad 3) Escribe un predicado Prolog ordenaci´on(L1,L2) basado en el
+% metodo de la inserci ´ on, usando un predicado ´ insercion(X,L1,L2) que signifique: “L2 es la lista obtenida al insertar X en su sitio en la lista de enteros L1 que
+% esta ordenada de menor a mayor”.
+
+ordnacion2([],[]).
