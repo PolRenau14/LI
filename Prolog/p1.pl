@@ -120,4 +120,58 @@ ordenacion(L1,L2):- permutacion(L1,L2),ordenada(L2).
 % metodo de la inserci ´ on, usando un predicado ´ insercion(X,L1,L2) que signifique: “L2 es la lista obtenida al insertar X en su sitio en la lista de enteros L1 que
 % esta ordenada de menor a mayor”.
 
-ordnacion2([],[]).
+
+insercion(X,[],[X]).
+insercion(X,[Y|L1],[X,Y|L1]) :- X=<Y.
+insercion(X,[Y|L1],[Y|L2]) :- X>Y, insercion(X,L1,L2).
+
+ordenacion2([],[]).
+ordenacion2([X|L1],L2) :- ordenacion2(L1,L3), insercion(X,L3,L2).
+
+
+% (dificultad 3) Escribe un predicado Prolog ordenación(L1,L2) basado en el
+% método de la fusión (merge sort): si la lista tiene longitud mayor que 1, con
+% concat divide la lista en dos mitades, ordena cada una de ellas (llamada recur-
+% siva) y después fusiona las dos partes ordenadas en una sola (como una “crema-
+% llera”). Nota: este algoritmo puede llegar a hacer como mucho n log n compa-
+% raciones (donde n es el tamaño de la lista), lo cual es demostrablemente óptimo.
+
+fusiona([],L2,L2).
+fusiona(L1,[],L1).
+fusiona([X|L1],[Y|L2],[X|LR]):-
+  X < Y,!, fusiona(L1,[Y|L2],LR).
+fusiona([X|L1],[Y|L2],[Y|LR]):-
+  fusiona([X|L1],L2,LR).
+
+divide([],[],[]).
+divide([X],[X],[]).
+divide([X,Y|L],[X|L1],[Y|L2]):- divide(L,L1,L2).
+
+ordenacion3([],[]):- !.
+ordenacion3([X],[X]):- !.
+ordenacion3(L1,L2):- divide(L1,LP1,LP2), ordenacion3(LP1,LR1),ordenacion3(LP2,LR2),fusiona(LR1,LR2,L2).
+
+
+
+
+% (dificultad 4) Escribe un predicado diccionario(A,N) que, dado un alfabe-
+% to A de sı́mbolos y un natural N, escriba todas las palabras de N sı́mbolos, por
+% orden alfabético (el orden alfabético es según el alfabeto A dado). Ejemplo:
+% diccionario( [ga,chu,le],2) escribirá:
+% %%%% === >gaga gachu gale chuga chuchu chule lega lechu lele.
+
+nmembers(_,0,[]):- !.
+nmembers(A,N,[X|L]):- pert(X,A),N1 is N -1, nmembers(A,N1,L).
+
+escribir([]):- write(' '),nl,!.
+escribir([X|L]):- write(X),escribir(L).
+
+diccionario(A,N):- nmembers(A,N,L),escribir(L),fail.
+
+
+
+
+% dificultad 3) Escribe un predicado palı́ndromos(L) que, dada una lista de le-
+% tras L, escriba todas las permutaciones de sus elementos que sean palı́ndromos
+% (capicúas).
+% Ejemplo: palindromos([a,a,c,c]) escribe [a,c,c,a] y [c,a,a,c].
