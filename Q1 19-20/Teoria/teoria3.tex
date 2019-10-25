@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amssymb}  % per fer els simbols.
+\usepackage{amsmath}  % per utilitzar tots aquells simbols matematics
+
+\title{Deducci\'on en L\'ogica Proposicional}
+\author{Pol Renau Larrod\'e}
+\date{Quadrimestre tardor 2019-2020}
+
+\begin{document}
+  \maketitle
+  \newpage
+
+  % per fer un índex.
+  \tableofcontents
+  \newpage
+
+  \section{Formes normals i cl\`ausals}
+    \begin{itemize}
+      \item  \textbf{F\`ormulas com conjunts:}  Sigui  F una f\`ormula construida nom\'es mitjançant la connectiva $\land$ , amb les pr\`opietats d'idempot\`encia, commutitvitat, i asossiacitivitat % podem escriure com un conjunt [ F_1, \dotsc ,  F_n]
+      \item  \textbf{Literals:} Un literal es un  s\'imbol de predicat p, que pot ser positiu (p) o negatiu ( $\neg$ p)
+      \item  \textbf{CNF: } es una conjunci\'o de disjunci\'o de literals: (p  $\lor$ k) $\land$ ( r $\lor$ s)
+      \item  \textbf{DNF: } es una disjunci\'o de conjunci\'o de literals: (p  $\lor$ k) $\land$ (  r$\lor$ s)
+      \item  \textbf{Cl\`ausulas: } es una disjunci\'o de literals.
+      \item  \textbf{Conjunt de cl\`ausules: } una f\`ormula en CNF es com una conjunci\'o de c\`ausules  que pot veures com un conjunt de clausules.
+      \item  \textbf{Cl\`ausula buida: } la disjunci\'o de 0 literals. Representada com $\square$ .
+      \item  \textbf{Cl\`ausulas de Horn: } es una cl\`ausula on cm a m\`axim te un literal positiu.
+    \end{itemize}
+
+  \section{Nocions  informals de decibilitat i compl\`exitat}
+
+  Donada una interpretaci\'o I i una f\`ormula F, \'es f\`acil determinar si I $\models$ F. No \'es tant f\`acil decidir si F \'es satisfactible o no.
+
+  At\'es que hi han $2^{P}$ interpretacions, on P es el nombre diferents simbols de la l\`ogica plantejada.
+
+
+  La l\`ogica proposicional sabem que tots els problemes que podem resoldre amb ellas s\'on decidibles, tot i que podem tardar m\'es o menys depenenet el tipus de problema escollit.
+  Aix\`o \'es possible, ja que te un nombre finit de simbols, un nobre finit d'interpretacions, i per \'ultim donada una interpretaci\'o I i una f\`ormula F \'es decidible.
+
+  \section{Resoluci\'o. Correcci\'o i completitud}
+    \begin{itemize}
+        \item \textbf{Resoluci\'o:} Una regla deductiva ens diu com obtenir certes noves f\`ormulas, a partir d'una f\`ormula donada.
+          % \quad serveix per deiar espai en formules, \oveline el fem perque no ens deixa fer el negat.
+          \[\frac{pvC  \quad \overline{p} v D}{C v D} \]
+        \item \textbf{Clausura sota resolució: } Sigui S un conjunt de clausules, conjunt de calusules que es poden obtenir amb 0 o m\'es pasos de resoluci\'o \textit{(Res(S))}. També denotem com a $Res_i$(S), conjunt de clausules obtingudes al aplicar \textbf{i} clausules de resolució.
+
+          \begin{equation*}
+            \begin{cases}
+              $S_0$ = S \\
+              $S_{i+1}$ = $S_i$
+            \end{cases}
+          \end{equation*}
+
+    \end{itemize}
+
+
+  \section{El procediment de David-Putnam-Logemann-Loveland (DPLL)}
+
+
+\end{document}

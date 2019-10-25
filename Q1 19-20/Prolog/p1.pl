@@ -167,6 +167,7 @@ escribir([]):- write(' '),nl,!.
 escribir([X|L]):- write(X),escribir(L).
 
 diccionario(A,N):- nmembers(A,N,L),escribir(L),fail.
+diccionario(_,_).
 
 
 
@@ -175,3 +176,15 @@ diccionario(A,N):- nmembers(A,N,L),escribir(L),fail.
 % tras L, escriba todas las permutaciones de sus elementos que sean palı́ndromos
 % (capicúas).
 % Ejemplo: palindromos([a,a,c,c]) escribe [a,c,c,a] y [c,a,a,c].
+
+
+
+
+es_palindromo([]).
+es_palindromo([_]):- !.
+es_palindromo([X|L]):- append(L1,[X],L),es_palindromo(L1).
+
+% La funció set of la fem servir  per no tenir repetits.
+
+palindromos(L):- setof(P,(permutacion(L,P), es_palindromo(P)),S), write(S).
+palindromos(_).
