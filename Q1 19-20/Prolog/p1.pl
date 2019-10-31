@@ -188,3 +188,55 @@ es_palindromo([X|L]):- append(L1,[X],L),es_palindromo(L1).
 
 palindromos(L):- setof(P,(permutacion(L,P), es_palindromo(P)),S), write(S).
 palindromos(_).
+
+
+% 19. (dificultad 4) ¿Qué 8 dı́gitos diferentes tenemos que asignar a las letras
+% S,E,N,D,M,O,R,Y, de manera que se cumpla la suma SEND+MORE=MONEY? Re-
+% suelve el problema en Prolog con un predicado suma que sume listas de dı́gitos.
+% El programa debe decir “no” si no existe solución.
+
+
+es_correcte([],[],[],X,X).
+es_correcte([X1|L1],[X2|L2],[X3|L3],Xin,Xout):- X3 is (X1 + X2 + Xin) mod 10, X is (X1 + X2 + Xin) // 10, es_correcte(L1,L2,L3,X,Xout).
+
+send_more_money:-permutacion([S,E,N,D,M,O,R,Y,_,_],[0,1,2,3,4,5,6,7,8,9]),es_correcte([D,N,E,S],[E,R,O,M],[Y,E,N,O],0,M),
+  write('S is '), write(S),nl,
+  write('E is '), write(E),nl,
+  write('N is '), write(N),nl,
+  write('D is '), write(D),nl,
+  write('M is '), write(M),nl,
+  write('O is '), write(O),nl,
+  write('R is '), write(R),nl,
+  write('Y is '), write(Y),nl.
+
+send_more_money:-write('no').
+
+
+
+% 21. (dificultad 4) Tres misioneros y tres canı́bales desean cruzar un rı́o. Solamente
+% se dispone de una canoa que puede ser utilizada por 1 ó 2 personas: misioneros
+% ó canı́bales. Si los misioneros quedan en minorı́a en cualquier orilla, los canı́bales
+% se los comerán. Escribe un programa Prolog que halle la estrategia para que todos
+% lleguen sanos y salvos a la otra orilla.
+
+
+
+mis:- camino( [lado1,3,3], [lado2,0,0], [[lado1,3,3]] ).
+
+camino(Fin,Fin,Cam):- reverse(Cam,Sol), write(Sol), nl.
+camino(Ini,Fin,Cam):- paso(Ini,E), novisitado(E,Cam),camino(E,Fin,[E|Cam]).
+
+
+novisitado(_,[]).
+novisitado(E,[E1|Cam]):- E \= E1,novisitado(E,Cam).
+
+paso( [lado1,M1,C1], [lado2,M2,C2] ):- pasan(M,C), M2 is M1-M, C2 is C1-C, safe(M2,C2).
+paso( [lado2,M1,C1], [lado1,M2,C2] ):- pasan(M,C), M2 is M1+M, C2 is C1+C, safe(M2,C2).
+
+pasan(M,C):- member( [M,C], [ [0,1], [0,2], [1,0], [1,1], [2,0] ] ).
+
+safe(M,C):- M>=0, M=<3, C>=0, C=<3, nocomen( M, C),
+            M1 is 3-M,  C1 is 3-C,  nocomen(M1,C1).
+
+nocomen(0,_).
+nocomen(M,C):- M>=C.

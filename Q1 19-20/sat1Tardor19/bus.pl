@@ -67,7 +67,7 @@ maxDistance(C1,C2,C3):-     trip(C1-C2),trip(C2-C3),dist(C1,C2,D1),dist(C2,C3,D2
 
 %%%%%%  SAT Variables:
 satVariable(bdc(B,D,C)):- bus(B),day(D),city(C).
-satVariable(bddcc(B,D1,D2,C1,C2)):- bus(B),consecutiveDays(D1,D2),trip(C1-C2).
+satVariable(dcc(D1,C1,C2)):- consecutiveDays(D1,_),trip(C1-C2).
 
 
 writeClauses:-
@@ -90,14 +90,13 @@ everyBusHaveCity.
 everyBusTravel:- bus(B),consecutiveDays(D1,D2),city(C),writeClause([-bdc(B,D1,C),-bdc(B,D2,C)]),fail.
 everyBusTravel.
 
-connectCities:- bus(B),trip(C1-C2),consecutiveDays(D1,D2),writeClause([-bdc(B,D1,C1),-bdc(B,D2,C2),bddcc(B,D1,D2,C1,C2)]),fail.
+connectCities:- bus(B),trip(C1-C2),consecutiveDays(D1,D2),writeClause([-bdc(B,D1,C1),-bdc(B,D2,C2),dcc(D1,C1,C2)]),fail.
 connectCities.
 
-reconnect:- bus(B),trip(C1-C2),consecutiveDays(D1,D2),writeClause([-bddcc(B,D1,D2,C1,C2),bdc(B,D1,C1)])
-            ,writeClause([-bddcc(B,D1,D2,C1,C2),bdc(B,D2,C2)]),fail.
+reconnect:- trip(C1-C2),findall(dcc(D,C1,C2),notLastDay(D),L),atLeast(1,L),fail.
 reconnect.
 
-everyCityIsConnected:- trip(C1-C2),findall(bddcc(B,D1,D2,C1,C2),(consecutiveDays(D1,D2),bus(B)),L),atLeast(1,L),fail.
+everyCityIsConnected:-  trip(C1-C2), consecutiveDays(D1,D2), bus(B), writeClause([-dcc(D1,C1,C2),-bdc(B,D1,C1), bdc(B,D2,C2)]) ,fail.
 everyCityIsConnected.
 
 noBusMaxDist:- bus(B),maxDistance(C1,C2,C3),consecutiveDays(D1,D2,D3),writeClause([-bdc(B,D1,C1),-bdc(B,D2,C2),-bdc(B,D3,C3)]),fail.
