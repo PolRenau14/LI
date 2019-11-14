@@ -43,7 +43,6 @@ moderator(M):-         numModerators(N), between(1,N,M).
 satVariable(ed(E,D)):- event(E),day(D).
 satVariable(md(M,D)):- moderator(M),day(D).
 satVariable(em(E,M)):- event(E),moderator(M).
-satVariable(emd(E,M,D)):- event(E),moderator(M),day(D).
 
 writeClauses:-
     everyEventOneDay,

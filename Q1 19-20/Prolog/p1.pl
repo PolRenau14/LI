@@ -39,6 +39,9 @@ my_union([_|L1],L2,R):- my_union(L1,L2,R).
 % (dificultad 2) Usando el concat, escribe predicados para el último de una lista
 % dada, y para el inverso de una lista dada.
 
+my_last([X],X).
+my_last([_|L],Last):- my_last(L,Last).
+
 my_reverse([L],L).
 my_reverse([X|L1],LR):- my_reverse(L1,LR1),concat(LR1,X,LR).
 
@@ -60,7 +63,7 @@ fib(N,F):- N1 is N -1, N2 is N -2,fib(N1,F1),fib(N2,F2), F is F1 + F2.
 dados(0,0,[]).
 dados(P,N,[X|LR]):-
     N > 0, pert(X,[1,2,3,4,5,6]),
-    Px is P-X, Nx is N-1,
+    Px is P-X, Px >= 0,Nx is N-1,
     dados(Px,Nx,LR).
 
 %(dificultad 2) Escribe un predicado suma demas(L) que, dada una lista de enteros L, se satisface si existe algun elemento en ´ L que es igual a la suma de los
@@ -78,6 +81,9 @@ suma_demas(L):- append(L1,[X|L2],L),append(L1,L2,LS), suma_lista(LS,SX),X == SX.
 suma_ants([]).
 suma_ants([X,Y|_]):- X==Y.
 suma_ants([X,Y|L]):- X1 is X+Y, suma_ants([X1|L]).
+
+% altre operaciones
+suma_ants2(L):- append(L1,[X|L2],L), suma_lista(L1,Suma),Suma == X.
 
 
 % (dificultad 2) Escribe un predicado card(L) que, dada una lista de enteros L,
