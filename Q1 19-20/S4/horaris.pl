@@ -32,6 +32,7 @@ symbolicOutput(0).  % set to 1 to see symbolic output only; 0 otherwise.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+%% Find the minimal number of colors needed to color a graph.
 %% Example input:
 
 numYears(4).
@@ -88,6 +89,12 @@ satVariable( cdh(C,D,H) ):- course(C), day(D), hour(H).
 satVariable( cp(C,P)    ):- course(C), professor(P).
 % cr(C,R) meaning "course C taught in room R"
 satVariable( cr(C,R)    ):- course(C), room(R).
+
+satVariable( cpdh(C,P,D,H) ):- course(C),professor(P),day(D),hour(H).
+satVariable( crdh(C,R,D,H) ):- course(C),room(R),day(D),hour(H).
+satVariable( cd(C,D) ):- course(C),day(D).
+satVariable( p(P) ):- professor(P).
+
 %% Use at least the previuos variables. Otherwise you should change displaySol.
 %% However, more variables might be needed....
 
@@ -97,8 +104,80 @@ satVariable( cr(C,R)    ):- course(C), room(R).
 
 writeClauses(infinite):- !, N = 1000, writeClauses(N),!. % N = 1000 should be replaced with by right N
 writeClauses(MaxNumProf):-
+    exactly1RoomperCourse,
+    exactly1validProfperCourse,
+    atMost1SameCourseperDay,
+    cdh2cd,
+    cd2cdh,
+    numeroExacteHores,
+    cdhAndcr2crdh,
+    crdh2cdhAndcd,
+    atMost1CourseperDayHourRoom,
+    cdhAndcp2cpdh,
+    cpdh2cdhAndcp,
+    profeCantTeleport,
+    sameYearCantOverlap,
+    cp2p,
+    p2cp,
+    maxNumProfs(MaxNumProf),
     true,!.
 writeClauses(_):- told, nl, write('writeClauses failed!'), nl,nl, halt.
+
+exactly1RoomperCourse:- course(C),courseRooms(C,LR),findall(cr(C,R),member(R,LR),Lits),exactly(1,Lits),fail.
+%% obliguem a que nomes hi hagi una clase de les disponibles
+exactly1RoomperCourse:- course(C),courseRooms(C,LR),\+member(R,LR),writeClause([-cr(C,R)]),fail.
+%% fem que aixi no es pugui assignar una clase no valida.
+exactly1RoomperCourse.
+
+exactly1validProfperCourse:- course(C),courseProfessors(C,LP),findall(cp(C,P),member(P,LP),Lits),exactly(1,Lits),fail.
+exactly1validProfperCourse:- course(C),courseProfessors(C,LP),\+member(P,LP),writeClause([-cp(C,P)]),fail.
+exactly1validProfperCourse.
+
+atMost1SameCourseperDay:- day(D),course(C),findall(cdh(C,D,H),hour(H),Lits),atMost(1,Lits),fail.
+atMost1SameCourseperDay.
+
+
+cdh2cd:- course(C), day(D), hour(H), writeClause([-cdh(C,D,H), cd(C,D)]), fail.
+cdh2cd.
+
+
+cd2cdh:- course(C), day(D), findall(cdh(C, D, H), hour(H), L), writeClause([-cd(C,D) | L]), fail.
+cd2cdh.
+
+numeroExacteHores:- course(C), courseHours(C,Hs),findall(cd(C,D),day(D),Lits),exactly(Hs,Lits),fail.
+numeroExacteHores.
+
+cdhAndcr2crdh:- course(C),day(D),hour(H),courseRooms(C,LR),member(R,LR),writeClause([-cdh(C,D,H),-cr(C,R),crdh(C,R,D,H)]),fail.
+cdhAndcr2crdh.
+
+crdh2cdhAndcd:- course(C), day(D), hour(H), courseRooms(C,LR),member(R,LR),writeClause([-crdh(C,R,D,H),cdh(C,D,H)]),writeClause([-crdh(C,R,D,H),cd(C,D)]),fail.
+crdh2cdhAndcd.
+
+atMost1CourseperDayHourRoom:- day(D),hour(H),room(R),findall(crdh(C,R,D,H),course(C),Lits),atMost(1,Lits),fail.
+atMost1CourseperDayHourRoom.
+
+cdhAndcp2cpdh:- course(C),day(D),hour(H),courseProfessors(C,LP),member(P,LP),writeClause([-cdh(C,D,H),-cp(C,P),cpdh(C,P,D,H)]),fail.
+cdhAndcp2cpdh.
+
+cpdh2cdhAndcp:- course(C),day(D),hour(H),courseProfessors(C,LP),member(P,LP),writeClause([-cpdh(C,P,D,H),cdh(C,D,H)]),writeClause([-cpdh(C,P,D,H),cp(C,P)]),fail.
+cpdh2cdhAndcp.
+
+profeCantTeleport:- professor(P),day(D),hour(H),findall(cpdh(C,P,D,H),course(C),Lits),atMost(1,Lits),fail.
+profeCantTeleport.
+
+sameYearCantOverlap:- year(Y),day(D),hour(H),findall(cdh(C,D,H),courseYear(C,Y),Lits),atMost(1,Lits),fail.
+sameYearCantOverlap.
+
+cp2p:- course(C), courseProfessors(C, Ps), member(P, Ps), writeClause([-cp(C, P), p(P)]), fail.
+cp2p.
+
+p2cp:- professor(P), findall(cp(C, P), (courseProfessors(C, Ps), member(P, Ps)), L), writeClause([-p(P) | L]), fail.
+p2cp.
+
+
+maxNumProfs(MaxNumProf):- findall(p(P), professor(P),Lits),atMost(MaxNumProf,Lits),fail.
+maxNumProfs(_).
+
 
 
 
@@ -145,7 +224,7 @@ displaySol(_):- nl,!.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 4. This predicate computes the cost of a given solution M:
 
-costOfThisSolution(M,Cost):- Cost = 0.
+costOfThisSolution(M,Cost):- findall(P,member(cp(_,P),M),Lits), sort(Lits,Profs),length(Profs,Cost),!.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

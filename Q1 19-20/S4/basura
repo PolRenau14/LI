@@ -1,0 +1,19 @@
+
+var initialEdge = DCEL.vertices[p].edge;
+var currentEdge = initialEdge;
+var faces = [];
+faces[0] = DCEL.edges[initialEdge].faceLeft;
+do{
+  edges = findTriangle(faces[faces.length-1]).edges;
+  console.log(edges)
+  for(var i=0; i<edges.length; i++){
+    if(edges[i] != currentEdge && (DCEL.edges[edges[i]].vertexBegin == p || DCEL.edges[edges[i]].vertexEnd == p)){
+      currentEdge = edges[i];
+      if(DCEL.edges[initialEdge].faceLeft == faces[faces.length-1])
+        faces.push(DCEL.edges[initialEdge].faceRight);
+      else
+        faces.push(DCEL.edges[initialEdge].faceLeft);
+      break;
+    }
+  }
+}while(currentEdge != initialEdge)
