@@ -1,8 +1,3 @@
-main:- retractall(bestMovements(_,_)),  assertz(bestMovements(100,[])),  % "infinite" movements
-       hAguas(0,0,0,[(0,0)]).
-
-main:- bestMovements(BestMov,ReverseMovements), reverse( ReverseMovements, Movements ), nl,
-       write('Optimal movements: '), write(Movements), write('. '), write(BestMov), write(' moves.'), nl, nl, halt.
 
 
 %% Operaciones
